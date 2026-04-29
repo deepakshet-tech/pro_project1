@@ -1925,7 +1925,7 @@ function Navbar({
                 padding: "0 12px",
                 cursor: "pointer",
                 fontFamily: "'DM Sans',sans-serif",
-                minWidth: "100",
+                minWidth: 100,
                 height: "100%",
                 fontWeight: 500,
               }}
