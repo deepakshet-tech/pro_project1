@@ -1,4 +1,7 @@
 import { useState, useRef, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import AppRoutes from "./routes/AppRoutes";
+import { ROUTE_PATHS, pageFromPath } from "./routes/routePaths";
 
 const STYLES = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -601,7 +604,7 @@ function Toast({ msg, visible }) {
 }
 
 /* ─── NAVBAR ──────────────────────────────────────────────────────────────── */
-function Navbar({ page, setPage, cartItems, onOpenCart, showToast, onOpenAccount, onOpenWishlist }) {
+function Navbar({ page, setPage, cartItems, onOpenCart, onOpenAccount, onOpenWishlist }) {
   const cartCount = cartItems.reduce((s,i) => s+i.qty, 0);
   const [search, setSearch] = useState("");
   const [searchCat, setSearchCat] = useState("All");
@@ -749,7 +752,7 @@ function Navbar({ page, setPage, cartItems, onOpenCart, showToast, onOpenAccount
 }
 
 /* ─── PRODUCT CARD ────────────────────────────────────────────────────────── */
-function PCard({ p, setPage, addToCart }) {
+export function PCard({ p, setPage, addToCart }) {
   const [err, setErr] = useState(false);
   return (
     <div onClick={() => setPage("detail")} className="pcard" style={{ background:"#fff", border:"1.5px solid #e5e7eb", borderRadius:16, overflow:"hidden", cursor:"pointer", display:"flex", flexDirection:"column" }}>
@@ -778,7 +781,7 @@ function PCard({ p, setPage, addToCart }) {
   );
 }
 
-function SHead({ title, sub, cta, onCta }) {
+export function SHead({ title, sub, cta, onCta }) {
   return (
     <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"space-between", marginBottom:24 }}>
       <div>
@@ -790,7 +793,7 @@ function SHead({ title, sub, cta, onCta }) {
   );
 }
 
-function BlogCard({ b }) {
+export function BlogCard({ b }) {
   return (
     <div className="pcard" style={{ background:"#fff", border:"1.5px solid #e5e7eb", borderRadius:16, overflow:"hidden", cursor:"pointer" }}>
       <div style={{ height:160, overflow:"hidden" }}><img src={b.img} alt={b.title} style={{ width:"100%", height:"100%", objectFit:"cover" }} /></div>
@@ -807,7 +810,7 @@ function BlogCard({ b }) {
 }
 
 /* ─── HOME ────────────────────────────────────────────────────────────────── */
-function HomePage({ setPage, addToCart }) {
+export function HomePage({ setPage, addToCart }) {
   const [slide, setSlide] = useState(0);
   const banners = [
     { from:"#064e3b", to:"#065f46", label:"FLAT 20% OFF", title:"Medicines Delivered\nto Your Doorstep", sub:"Genuine medicines · Expert pharmacists · Fast delivery.", cta:"Shop Now", p:"products" },
@@ -892,7 +895,7 @@ function HomePage({ setPage, addToCart }) {
 }
 
 /* ─── PRODUCTS ────────────────────────────────────────────────────────────── */
-function ProductsPage({ setPage, addToCart }) {
+export function ProductsPage({ setPage, addToCart }) {
   const [cat, setCat] = useState("All");
   const [sort, setSort] = useState("Relevance");
   const [price, setPrice] = useState(5000);
@@ -954,7 +957,7 @@ function ProductsPage({ setPage, addToCart }) {
 }
 
 /* ─── DETAIL ──────────────────────────────────────────────────────────────── */
-function DetailPage({ setPage, addToCart, showToast }) {
+export function DetailPage({ setPage, addToCart, showToast }) {
   const [qty, setQty] = useState(1);
   const [sel, setSel] = useState(0);
   const p = PRODUCTS[sel];
@@ -1021,7 +1024,7 @@ function DetailPage({ setPage, addToCart, showToast }) {
 }
 
 /* ─── RX ──────────────────────────────────────────────────────────────────── */
-function RxPage({ showToast }) {
+export function RxPage({ showToast }) {
   const [file, setFile] = useState(null);
   const [drag, setDrag] = useState(false);
   const ref = useRef();
@@ -1068,7 +1071,7 @@ function RxPage({ showToast }) {
 }
 
 /* ─── PACKAGES ────────────────────────────────────────────────────────────── */
-function PackagesPage({ showToast, onBookPkg }) {
+export function PackagesPage({ onBookPkg }) {
   const tabs = ["All Packages","Diabetes","Cardiac","Full Body","Women's Health","Senior Citizen"];
   const [active, setActive] = useState("All Packages");
   return (
@@ -1114,7 +1117,7 @@ function PackagesPage({ showToast, onBookPkg }) {
 }
 
 /* ─── BLOG ────────────────────────────────────────────────────────────────── */
-function BlogPage() {
+export function BlogPage() {
   const filters = ["All","Nutrition","Medication","Mental Health","Cardiac","Fitness","Wellness"];
   const [active, setActive] = useState("All");
   const filtered = active==="All" ? BLOGS : BLOGS.filter(b => b.tag===active);
@@ -1153,7 +1156,7 @@ function BlogPage() {
 }
 
 /* ─── CONTACT ─────────────────────────────────────────────────────────────── */
-function ContactPage({ showToast }) {
+export function ContactPage({ showToast }) {
   const [form, setForm] = useState({ first:"", last:"", email:"", phone:"", type:"", message:"" });
   const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
   const inp = { width:"100%", border:"1.5px solid #e5e7eb", borderRadius:10, padding:"12px 14px", fontSize:14, outline:"none", fontFamily:"'DM Sans',sans-serif", color:"#111827", background:"#fff" };
@@ -1262,7 +1265,9 @@ function Footer({ setPage }) {
 
 /* ─── APP ─────────────────────────────────────────────────────────────────── */
 export default function App() {
-  const [page, setPage] = useState("home");
+  const location = useLocation();
+  const routerNavigate = useNavigate();
+  const page = pageFromPath(location.pathname);
   const [cartItems, setCartItems] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [cartConfirmed, setConfirmed] = useState(false);
@@ -1291,16 +1296,9 @@ export default function App() {
     setTimeout(() => { setConfirmed(false); setCartItems([]); }, 8000);
   };
 
-  const navigate = p => { setPage(p); window.scrollTo(0,0); };
-
-  const PAGES = {
-    home: <HomePage setPage={navigate} addToCart={addToCart} />,
-    products: <ProductsPage setPage={navigate} addToCart={addToCart} />,
-    detail: <DetailPage setPage={navigate} addToCart={addToCart} showToast={showToast} />,
-    rx: <RxPage showToast={showToast} />,
-    packages: <PackagesPage showToast={showToast} onBookPkg={setBookingPkg} />,
-    blog: <BlogPage />,
-    contact: <ContactPage showToast={showToast} />,
+  const navigate = p => {
+    routerNavigate(ROUTE_PATHS[p] || ROUTE_PATHS.home);
+    window.scrollTo(0,0);
   };
 
   return (
@@ -1316,11 +1314,17 @@ export default function App() {
         <Navbar
           page={page} setPage={navigate}
           cartItems={cartItems} onOpenCart={() => setCartOpen(true)}
-          showToast={showToast}
           onOpenAccount={() => setAccountOpen(true)}
           onOpenWishlist={() => setWishlistOpen(true)}
         />
-        <main style={{ background:"#f3f4f6", flex:1 }}>{PAGES[page] || PAGES.home}</main>
+        <main style={{ background:"#f3f4f6", flex:1 }}>
+          <AppRoutes
+            navigate={navigate}
+            addToCart={addToCart}
+            showToast={showToast}
+            setBookingPkg={setBookingPkg}
+          />
+        </main>
         <Footer setPage={navigate} />
 
         {/* Modals inside #app-root so they overlay it correctly */}
