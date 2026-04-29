@@ -1906,7 +1906,7 @@ function Navbar({
               background: "#f9fafb",
             }}
           >
-            {/* ✅ FIXED select: controlled value + visible text color */}
+            {/* ✅ FIXED select: controlled value + visible text color
             <select
               className="search-cat"
               value={searchCat}
@@ -1938,7 +1938,7 @@ function Navbar({
               <option value="Nutrition">Nutrition</option>
               <option value="Baby Care">Baby Care</option>
               <option value="Ayurveda">Ayurveda</option>
-            </select>
+            </select> */}
             <input
               value={search}
               onChange={(e) => {
